@@ -87,6 +87,27 @@ do
   vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'replace without changing clipboard' })
   vim.keymap.set({ 'n', 'v' }, '<leader>dd', [["_d]], { desc = 'delete without yank' })
 
+  vim.keymap.set("n", "<leader>gf", function()
+    local path = vim.fn.expand("<cfile>")
+    if path == "" then return end
+
+    -- Resolve relative to the current buffer's directory
+    local base = vim.fn.expand("%:p:h")
+    local full = vim.fn.fnamemodify(path, ":p")
+    if not path:match("^[/~]") then
+      full = base .. "/" .. path
+    end
+    full = vim.fn.expand(full)
+
+    -- Create parent dirs and the file if missing
+    if vim.fn.filereadable(full) == 0 and vim.fn.isdirectory(full) == 0 then
+      vim.fn.mkdir(vim.fn.fnamemodify(full, ":h"), "p")
+      local f = io.open(full, "w")
+      if f then f:close() end
+    end
+
+    vim.cmd("edit " .. vim.fn.fnameescape(full))
+  end, { desc = "Go to file, creating it if missing" })
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
 
