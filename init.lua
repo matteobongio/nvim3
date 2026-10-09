@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -107,7 +107,7 @@ do
   --  For more options, you can see `:help option-list`
 
   -- Make line numbers default
-  vim.o.number = true
+  vim.o.relativenumber = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
   -- vim.o.relativenumber = true
@@ -122,13 +122,14 @@ do
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
   --  Remove this option if you want your OS clipboard to remain independent.
   --  See `:help 'clipboard'`
-  vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+  -- vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
   -- Enable break indent
   vim.o.breakindent = true
 
   -- Enable undo/redo changes even after closing and reopening a file
   vim.o.undofile = true
+  vim.opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
 
   -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
   vim.o.ignorecase = true
@@ -239,6 +240,28 @@ do
   -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
   -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
   -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+  vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
+  vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
+
+  vim.keymap.set({ 'i', 'x', 'n', 's' }, '<C-s>', '<cmd>w<cr><esc>', { desc = 'Save file' })
+
+  vim.keymap.set('i', '<C-z>', '<Esc>')
+
+  -- move highlighted Text
+  vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
+  vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+
+  -- make cursor stay put when appending from line below
+  vim.keymap.set('n', 'J', 'mzJ`z')
+
+  -- keep cursor in the middle when half page jumping
+  vim.keymap.set('n', '<C-d>', '<C-d>zz')
+  vim.keymap.set('n', '<C-u>', '<C-u>zz')
+
+  -- keep copy when replacing
+  vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'replace without changing clipboard' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>dd', [["_d]], { desc = 'delete without yank' })
 
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
@@ -781,18 +804,18 @@ do
 
   vim.pack.add {
     gh 'neovim/nvim-lspconfig',
-    gh 'mason-org/mason.nvim',
-    gh 'mason-org/mason-lspconfig.nvim',
-    gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
+    -- gh 'mason-org/mason.nvim',
+    -- gh 'mason-org/mason-lspconfig.nvim',
+    -- gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
   }
 
   -- Automatically install LSPs and related tools to stdpath for Neovim
-  require('mason').setup {}
+  -- require('mason').setup {}
 
   -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
-  require('mason-lspconfig').setup {
-    automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
-  }
+  -- require('mason-lspconfig').setup {
+  --   automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+  -- }
 
   -- Ensure the servers and tools above are installed
   --
@@ -801,12 +824,12 @@ do
   --    :Mason
   --
   -- You can press `g?` for help in this menu.
-  local ensure_installed = vim.tbl_keys(servers or {})
-  vim.list_extend(ensure_installed, {
-    -- You can add other tools here that you want Mason to install
-  })
+  -- local ensure_installed = vim.tbl_keys(servers or {})
+  -- vim.list_extend(ensure_installed, {
+  --   -- You can add other tools here that you want Mason to install
+  -- })
 
-  require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+  -- require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
   for name, server in pairs(servers) do
     vim.lsp.config(name, server)
@@ -849,7 +872,7 @@ do
     },
   }
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+  -- TODO: vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
 end
 
 -- ============================================================
@@ -1017,7 +1040,7 @@ do
   -- require 'kickstart.plugins.debug'
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
-  -- require 'kickstart.plugins.autopairs'
+  require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
@@ -1030,7 +1053,7 @@ do
   -- file and put their `vim.pack.add()` and `setup()` calls in the required order.
   --
   -- If separate modules need a specific order, require them explicitly instead:
-  -- require 'custom.plugins.colorscheme'
+  require 'custom.plugins.init'
   -- require 'custom.plugins.ui'
   -- require 'custom.plugins.git'
 end
