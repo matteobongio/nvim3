@@ -19,4 +19,4 @@ require("undotree").setup({
       ["quit"] = 'q' ,
     },
 })
-vim.keymap.set({ 'n' }, '<leader>u', function() require('undotree').toggle() end, { desc = 'Toggle [UndoTree' })
+vim.keymap.set({ 'n' }, '<leader>u', function() require('undotree').toggle() end, { desc = 'Toggle [U]ndoTree' })
